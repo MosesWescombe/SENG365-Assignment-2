@@ -1,9 +1,9 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-import { Home } from "./components/Home";
+import { Home } from "./Pages/Home";
 import NavBar from "./components/NavBar";
-import Register from "./components/Register";
+import Register from "./Pages/Register";
 import { useState } from "react";
-import Login from "./components/Login";
+import Login from "./Pages/Login";
 
 function App() {
   return (
