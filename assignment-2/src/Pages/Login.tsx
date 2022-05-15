@@ -17,7 +17,7 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { useState } from 'react';
 import FormHelperText from '@mui/material/FormHelperText';
-import { login, getProfilePhoto } from '../Services/Users';
+import { login, getProfilePhoto } from '../Services/UserServices';
 import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme();

@@ -18,7 +18,7 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { login, register, uploadProfilePhoto } from '../Services/Users';
+import { login, register, uploadProfilePhoto } from '../Services/UserServices';
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
 import DriveFileRenameOutlineSharpIcon from '@mui/icons-material/DriveFileRenameOutlineSharp';

@@ -13,7 +13,7 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import GavelIcon from '@mui/icons-material/Gavel';
 import { useNavigate } from "react-router-dom";
-import { logout, isLoggedIn , getProfilePhoto} from '../Services/Users';
+import { logout, isLoggedIn , getProfilePhoto} from '../Services/UserServices';
 
 const pages = ['Auctions'];
 let settings = ['Login', 'Register'];
@@ -104,7 +104,8 @@ const NavBar = ({ profileImage, setProfileImage }: any) => {
                 key={page}
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
-                {page}
+                
+                <div onClick={(e) => navigate(page)}>{page}</div>
               </Button>
             ))}
           </Box>
