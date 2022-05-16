@@ -1,5 +1,3 @@
-import { IBidResult } from "./IBidResult";
-
 export interface IFullAuctionResult {
     auctionId: number;
     title: string;
@@ -7,7 +5,7 @@ export interface IFullAuctionResult {
     categoryId: number;
     endDate: string;
     reserve: number;
-    highestBid: IBidResult;
+    highestBid: number;
     numBids: number;
     sellerId: number;
     sellerFirstName: string;

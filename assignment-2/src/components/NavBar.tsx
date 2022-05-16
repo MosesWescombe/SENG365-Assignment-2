@@ -1,4 +1,3 @@
-import * as React from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -13,13 +12,16 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import GavelIcon from '@mui/icons-material/Gavel';
 import { useNavigate } from "react-router-dom";
-import { logout, isLoggedIn , getProfilePhoto} from '../Services/UserServices';
+import { logout, isLoggedIn , getProfilePhoto, getLoggedInUser} from '../Services/UserServices';
+import { useState } from 'react';
+import { useEffect } from 'react';
 
 const pages = ['Auctions'];
 let settings = ['Login', 'Register'];
 
 const NavBar = ({ profileImage, setProfileImage }: any) => {
-  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const [anchorElUser, setAnchorElUser] = useState<null | HTMLElement>(null);
+  const [userName, setUserName] = useState("User")
   const navigater = useNavigate()
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
@@ -44,6 +46,18 @@ const NavBar = ({ profileImage, setProfileImage }: any) => {
   const navigate = (location: string) => {
     navigater(`/${location.toLowerCase()}`)
   }
+
+  useEffect(() => {
+    const getUser = async () => {
+        const response = await getLoggedInUser()
+
+        if (response == undefined || response.status !== 200) return
+        console.log(response)
+        setUserName("test")
+      }
+
+      getUser()
+  }, [])
 
   return (
     <AppBar position="static">
@@ -113,7 +127,7 @@ const NavBar = ({ profileImage, setProfileImage }: any) => {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="User" src={getProfilePhoto()} />
+                <Avatar alt={userName} src={getProfilePhoto()} />
               </IconButton>
             </Tooltip>
             <Menu

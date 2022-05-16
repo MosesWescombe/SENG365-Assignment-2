@@ -6,6 +6,20 @@ export const isLoggedIn = (): boolean => {
     return userId !== undefined && userId !== null
 }
 
+export const getLoggedInUser = async () => {
+    if (!isLoggedIn()) return undefined
+    const userId = parseInt(Cookies.get('UserId') as string || "") || undefined
+
+    const config = {
+        headers: {
+            "X-Authorization": Cookies.get('UserToken') || ""
+        }
+    }
+
+    const response = await axios.get(`http://localhost:4941/api/v1/users/${userId}`, config)
+    return response
+}
+
 export const uploadProfilePhoto = async (image: any) => {
     if (!isLoggedIn()) return
 
@@ -34,6 +48,10 @@ export const getProfilePhoto = () => {
     const userId = parseInt(Cookies.get('UserId') as string || "") || undefined
 
     return `http://localhost:4941/api/v1/users/${userId}/image`
+}
+
+export const getProfilePhotoFor = (id: number) => {
+    return `http://localhost:4941/api/v1/users/${id}/image`
 }
 
 export const logout = async () => {

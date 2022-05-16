@@ -2,17 +2,14 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import CardMedia from '@mui/material/CardMedia';
 import Typography from '@mui/material/Typography';
-import Chip from '@mui/material/Chip';
-import Stack from '@mui/material/Stack';
-import { Button, CardActionArea, CardActions, Grid } from '@mui/material';
-import { fetchAuction, fetchCategory } from '../Services/AuctionServices';
+import { CardActionArea, CardActions, Grid } from '@mui/material';
+import { fetchAuction } from '../Services/AuctionServices';
 import { useEffect, useState } from 'react';
 import { IFullAuctionResult } from '../Types/IFullAuctionResult';
-import { ICategoryItem } from '../Types/ICategoryItem';
+import AvatarChip from './AvatarChip';
 
-export default function AuctionItem({auctionId}: any) {
+export default function AuctionItem({auctionId, category}: any) {
     const [auction, setAuction] = useState<IFullAuctionResult | undefined>(undefined)
-    const [categorie, setCategorie] = useState<ICategoryItem | undefined>(undefined)
 
     // Get Auction
     useEffect(() => {
@@ -20,13 +17,6 @@ export default function AuctionItem({auctionId}: any) {
             fetchAuction(auctionId)
             .then((response) => {
                 if (response.status !== 200) return
-
-
-                fetchCategory(response.data.categoryId)
-                .then((response) => {
-                    setCategorie(response[0])
-                })
-            
                 setAuction(response.data)
             })
             .catch((error) => {
@@ -99,42 +89,70 @@ export default function AuctionItem({auctionId}: any) {
         return "closing soon"
     }   
 
+    const formatNumberToMoney = (number: number) => {
+        // Create our number formatter.
+        var formatter = new Intl.NumberFormat('en-US', {
+            style: 'currency',
+            currency: 'USD',
+        
+            // These options are needed to round to whole numbers if that's what you want.
+            //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+            maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+        });
+        
+        return formatter.format(number);
+    }
+    
     return (
-        <Card sx={{ maxWidth: 375, minWidth: 200 }}>
+        <Card sx={{ maxWidth: 375, minWidth: 200}}>
             <CardActionArea>
                 <CardMedia
                 component="img"
-                height="140"
+                height="180"
                 image={`http://localhost:4941/api/v1/auctions/${auction.auctionId}/image`}
                 alt="green iguana"
                 />
-                <CardContent>
-                <Grid item xs={12}>
-                    <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                    
-                        {categorie !== undefined? <p>{categorie.name}</p> : <></>}
-                        <p>{getTimeRemaining(auction.endDate)}</p>
+                <CardContent style={{paddingBottom: 0}}>
+                    <Grid item xs={12}>
+                        <div style={{display: 'flex', justifyContent: 'space-between'}}>
+                        
+                            {category !== undefined? <p>{category.name}</p> : <></>}
+                            <p>{getTimeRemaining(auction.endDate)}</p>
+                        </div>
+                    </Grid>
+                    <Typography gutterBottom variant="h5" component="div">
+                        {auction.title}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary" style={{maxHeight: 40, overflow: 'hidden'}}>
+                        {auction.description}
+                    </Typography>
+                    <div style={{marginTop: 10, marginRight: -8, display: 'flex', justifyContent: 'end'}}>
+                        <AvatarChip id={auction.sellerId} name={auction.sellerFirstName + " " + auction.sellerLastName}/>
                     </div>
-                </Grid>
-                <Typography gutterBottom variant="h5" component="div">
-                    {auction.title}
-                </Typography>
-                <Typography variant="body2" color="text.secondary">
-                    {auction.description}
-                </Typography>
                 </CardContent>
-            </CardActionArea>
-            <CardActions>
-                <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
-                    <div style={{}}>
-                        <p style={{padding: 0, margin: 0, fontSize: 12}}>{auction.highestBid !== null && auction.highestBid.amount >= auction.reserve? "Reserve met" : "Reserve not met"}</p>
-                        <p style={{padding: 0, margin: 0, fontSize: 20}}>${auction.reserve == null? "0.00" : auction.reserve}</p>
+                <CardActions>
+                    <div style={{width: '100%', display: 'flex', justifyContent: 'space-between'}}>
+                        <div>
+                            <p style={{padding: 0, margin: 0, fontSize: 12}}>
+                                {auction.highestBid !== null && auction.highestBid >= auction.reserve? "Reserve (met)" : "Reserve (not met)"}
+                            </p>
+                            <p style={{padding: 0, margin: 0, fontSize: 20}}>
+                                {auction.reserve == undefined || auction.reserve == null? "$0.00" : formatNumberToMoney(auction.reserve)}
+                            </p>
+                        </div>
+
+                        <div style={{display: 'flex', flexDirection: 'column', alignItems: 'end'}}>
+                            <p style={{padding: 0, margin: 0, fontSize: 12}}>
+                                {auction.highestBid == null? "Starting Bid" : "Highest Bid"}
+                            </p>
+                            <p style={{padding: 0, margin: 0, fontSize: 20}}>
+                                {auction.highestBid == null? "$0.00" : formatNumberToMoney(auction.highestBid)}
+                            </p>
+                        </div>
                     </div>
-                    <Button size="small" color="primary">
-                    Place Bid
-                    </Button>
-                </div>
-            </CardActions>
+                </CardActions>
+
+            </CardActionArea>
         </Card>
     );
 }
