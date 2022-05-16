@@ -115,7 +115,6 @@ export default function AuctionItem({auctionId, category}: any) {
                 <CardContent style={{paddingBottom: 0}}>
                     <Grid item xs={12}>
                         <div style={{display: 'flex', justifyContent: 'space-between'}}>
-                        
                             {category !== undefined? <p>{category.name}</p> : <></>}
                             <p>{getTimeRemaining(auction.endDate)}</p>
                         </div>
