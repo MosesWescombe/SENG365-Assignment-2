@@ -76,7 +76,7 @@ export default function Register({userId, setUserId}: any) {
         }
       }
 
-      navigate('/')
+      navigate('/auctions')
     };
 
     // Validate functions 

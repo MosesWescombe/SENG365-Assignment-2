@@ -41,7 +41,7 @@ export default function Login({setImage}: any) {
             return
         }
 
-        navigate('/')
+        navigate('/auctions')
     };
 
   return (
