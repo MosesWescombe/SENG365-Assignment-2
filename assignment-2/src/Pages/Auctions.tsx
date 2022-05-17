@@ -182,32 +182,32 @@ export const Auctions = () => {
     };
 
   return (
-    <div className="auction-page">
-        <Grid alignContent='center' alignItems='center' container spacing={4} sx={{padding: '40px 120px'}}>
-            <Grid item xs={12} style={{paddingTop: 8, display: 'flex', justifyContent: 'start', alignItems: 'center'}}>
+    <div style={{display: 'flex', justifyContent: 'center'}}>
+        <Grid alignContent='center' alignItems='center' container sx={{width: {xs: '100%', sm: '98%', md: '95%', lg: '95%'}, maxWidth: '1500px'}}>
+            <Grid item xs={12} style={{paddingTop: 8}}>
                 <Stack direction="row" spacing={1} sx={{display: 'flex', alignItems: 'center'}}>
-                <div>
-                    <Button
-                        id="basic-button"
-                        aria-controls={open ? 'basic-menu' : undefined}
-                        aria-haspopup="true"
-                        aria-expanded={open ? 'true' : undefined}
-                        onClick={handleFilterMenuClick}
-                    >
-                        Add Filter
-                    </Button>
-                    <Menu
-                        id="basic-menu"
-                        anchorEl={anchorEl}
-                        open={open}
-                        onClose={handleFilterMenuClose}
-                        MenuListProps={{'aria-labelledby': 'basic-button',}}
-                    >
-                        {categories.length > 0? categories.map((category: ICategoryItem) => (
-                            <MenuItem key={category.categoryId} onClick={(e) => handleFilterMenuClose(e, category)}>{category.name}</MenuItem>
-                        )) : <MenuItem>None</MenuItem>}
-                    </Menu>
-                </div>
+                    <div>
+                        <Button
+                            id="basic-button"
+                            aria-controls={open ? 'basic-menu' : undefined}
+                            aria-haspopup="true"
+                            aria-expanded={open ? 'true' : undefined}
+                            onClick={handleFilterMenuClick}
+                        >
+                            Add Filter
+                        </Button>
+                        <Menu
+                            id="basic-menu"
+                            anchorEl={anchorEl}
+                            open={open}
+                            onClose={handleFilterMenuClose}
+                            MenuListProps={{'aria-labelledby': 'basic-button',}}
+                        >
+                            {categories.length > 0? categories.map((category: ICategoryItem) => (
+                                <MenuItem key={category.categoryId} onClick={(e) => handleFilterMenuClose(e, category)}>{category.name}</MenuItem>
+                            )) : <MenuItem>None</MenuItem>}
+                        </Menu>
+                    </div>
                     {filters.map((category: ICategoryItem) => (
                         <Chip
                             key={category.categoryId}
@@ -255,7 +255,7 @@ export const Auctions = () => {
                 </ToggleButtonGroup>
             </Grid>
             {auctions.length > 0? (
-                <Grid item xs={12} style={{display: 'flex', justifyContent: 'center'}}>
+                <Grid item xs={12} py={2} style={{display: 'flex', justifyContent: 'center'}}>
                     <Pagination size='large' count={pages} page={page} onChange={handleChange} />
                 </Grid>
             ) : <></>}
@@ -269,7 +269,7 @@ export const Auctions = () => {
                 })
             ) : ""}
             {auctions.length > 0? (
-                <Grid item xs={12} style={{display: 'flex', justifyContent: 'center'}}>
+                <Grid py={2} item xs={12} style={{display: 'flex', justifyContent: 'center'}}>
                     <Pagination size='large' count={pages} page={page} onChange={handleChange} />
                 </Grid>
             ) : (
