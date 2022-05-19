@@ -259,15 +259,17 @@ export const Auctions = () => {
                     <Pagination size='large' count={pages} page={page} onChange={handleChange} />
                 </Grid>
             ) : <></>}
-            {auctions.length > 0? (
-                auctions.map((auction) => {
-                    return (
-                        <Grid key={auction.auctionId} item xs={12} md={6} lg={4} xl={3}>
-                            {categories.length > 0? <AuctionItem auctionId={auction.auctionId} category={getCategory(auction.categoryId)}/> : <></>}
-                        </Grid>
-                    )
-                })
-            ) : ""}
+            <Grid item xs={12} container spacing={3} display='flex' justifyContent='start'>
+                {auctions.length > 0? (
+                    auctions.map((auction) => {
+                        return (
+                            <Grid key={auction.auctionId} item xs={12} md={6} lg={4} xl={3} display='flex' justifyContent='center'>
+                                {categories.length > 0? <AuctionItem auctionId={auction.auctionId} category={getCategory(auction.categoryId)}/> : <></>}
+                            </Grid>
+                        )
+                    })
+                ) : ""}
+            </Grid>
             {auctions.length > 0? (
                 <Grid py={2} item xs={12} style={{display: 'flex', justifyContent: 'center'}}>
                     <Pagination size='large' count={pages} page={page} onChange={handleChange} />

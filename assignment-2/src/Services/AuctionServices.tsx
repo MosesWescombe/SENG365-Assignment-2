@@ -1,6 +1,12 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import { IAuctionConfig } from '../Types/Configs/IGetAuctionConfig';
 import { ICategoryItem } from '../Types/ICategoryItem';
+
+export const fetchBids = async (auctionId: number) => {
+  const response =  await axios.get(`http://localhost:4941/api/v1/auctions/${auctionId}/bids`)
+  return response;
+}
 
 export const fetchAuctions = async (config: IAuctionConfig) => {
     const response =  await axios.get(`http://localhost:4941/api/v1/auctions`, { params: config})
@@ -43,4 +49,17 @@ export const fetchImage = async (auctionId: number): Promise<string> => {
   .catch((error) => {
     return require("../assets/no_image.png")
   })
+}
+
+export const postBid = async (auctionId: number, amount: number) => {
+  const config = {
+    headers: {
+        "X-Authorization": Cookies.get('UserToken') || ""
+    }
+  }
+
+  const response = await axios.post(`http://localhost:4941/api/v1/auctions/${auctionId}/bids`, {
+    amount: amount
+  }, config)
+  return response
 }

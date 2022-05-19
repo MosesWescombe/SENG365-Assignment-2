@@ -88,3 +88,20 @@ export const formatDate = (dateString: string): string => {
 
     return formatted;
 }
+
+export const formatDateNoDay = (dateString: string): string => {
+    const dateNumber = Date.parse(dateString)
+    const date = new Date(dateNumber)
+    const today = new Date()
+
+    const options = { 
+        year: (date.getFullYear < today.getFullYear? "numeric" : undefined),
+        month: "short",  
+        day: "numeric", 
+        hour: "numeric", 
+        minute: "numeric" };
+    // @ts-ignore
+    const formatted = date.toLocaleDateString("en-NZ", options)
+
+    return formatted;
+}

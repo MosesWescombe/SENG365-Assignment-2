@@ -7,7 +7,7 @@ import { fetchAuction, fetchImage } from '../Services/AuctionServices';
 import { useEffect, useState } from 'react';
 import { IFullAuctionResult } from '../Types/IFullAuctionResult';
 import AvatarChip from './AvatarChip';
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { formatNumberToMoney, getTimeRemaining } from '../Services/CalculationServices';
 
 export default function AuctionItem({auctionId, category, minimized}: any) {
@@ -40,7 +40,7 @@ export default function AuctionItem({auctionId, category, minimized}: any) {
     }
 
     return (
-        <Card sx={{ maxWidth: 375, minWidth: 200}}>
+        <Card sx={{boxShadow: 8, width: '100%', maxWidth: 375, minWidth: 200}}>
             <CardActionArea onClick={openItem}>
                 <CardMedia
                 component="img"

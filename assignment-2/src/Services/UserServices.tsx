@@ -1,6 +1,12 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
 
+export const getUserId = (): number | undefined => {
+    let userId = Cookies.get('UserId')
+    if (userId !== undefined) return parseInt(userId)
+    return userId
+}
+
 export const isLoggedIn = (): boolean => {
     const userId = Cookies.get('UserId')
     return userId !== undefined && userId !== null

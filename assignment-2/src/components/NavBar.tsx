@@ -58,7 +58,7 @@ const NavBar = ({ profileImage, setProfileImage }: any) => {
 
       getUser()
   }, [])
-
+  
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
