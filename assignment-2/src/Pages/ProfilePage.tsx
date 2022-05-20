@@ -37,7 +37,7 @@ export const ProfilePage = () => {
             <Paper style={{width: '100%', maxWidth: '400px', padding: '16px'}}>
                 <Grid container xs={12} spacing={2}>
                     <Grid item xs={12} style={centerCSS}>
-                        <Avatar style={{height: imageSize, width: imageSize}} alt='User' src={getProfilePhoto()} />
+                        <Avatar style={{height: imageSize, width: imageSize}} alt={user?.firstName} src={getProfilePhoto()} />
                     </Grid>
                     <Grid item xs={12} style={centerCSS}>
                         <Typography variant="h4">
@@ -50,7 +50,7 @@ export const ProfilePage = () => {
                         </Typography>
                     </Grid>
                     <Grid item xs={12} style={centerCSS}>
-                        <Button variant='outlined'>Edit</Button>
+                        <Button variant='outlined' onClick={() => navigate('/editUserDetails')}>Edit</Button>
                         <Button variant='outlined' onClick={async () => await handleLogout()}>Logout</Button>
                     </Grid>
                 </Grid>

@@ -52,7 +52,7 @@ const NavBar = ({ profileImage, setProfileImage }: any) => {
         const response = await getLoggedInUser()
 
         if (response == undefined || response.status !== 200) return
-        setUserName("test")
+        setUserName(response.data.firstName)
       }
 
       getUser()

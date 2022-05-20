@@ -6,6 +6,7 @@ import { Auctions } from "./Pages/Auctions";
 import { AuctionItemPage } from "./Pages/AuctionItemPage";
 import { MyAuctions } from "./Pages/MyAuctions";
 import { ProfilePage } from "./Pages/ProfilePage";
+import EditUserDetails from "./Pages/EditUserDetails";
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path='/auction/:auctionId' element={<AuctionItemPage />}/>
           <Route path='/my-auctions' element={<MyAuctions />}/>
           <Route path='/profile' element={<ProfilePage />}/>
+          <Route path='/editUserDetails' element={<EditUserDetails />}/>
         </Routes>
       </Router>
     </div>

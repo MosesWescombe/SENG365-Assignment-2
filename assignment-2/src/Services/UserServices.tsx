@@ -49,6 +49,25 @@ export const uploadProfilePhoto = async (image: any) => {
     })
 }
 
+export const deleteProfilePhoto = async () => {
+    if (!isLoggedIn()) return
+    const userId = parseInt(Cookies.get('UserId') as string || "") || undefined
+
+    const config = {
+        headers: {
+            "X-Authorization": Cookies.get('UserToken') || ""
+        }
+    }
+
+    return await axios.delete(`http://localhost:4941/api/v1/users/${userId}/image`, config)
+    .then((response) => {
+        return response.status;
+    })
+    .catch((error) => {
+      return error.response.status;
+    })
+}
+
 export const getProfilePhoto = () => {
     if (!isLoggedIn()) return ""
     const userId = parseInt(Cookies.get('UserId') as string || "") || undefined
@@ -87,6 +106,44 @@ export const register = async (firstName: string, lastName: string, email: strin
         email: email,
         password: password
         })
+        .then((response) => {
+            return response.status;
+        })
+        .catch((error) => {
+            console.log(error)
+            return error.response.status;
+        })
+}
+
+export const updateUser = async (firstName: string, lastName: string, email: string, password?: string, currentPassword?: string) => {
+    if (!isLoggedIn()) return undefined
+    const userId = parseInt(Cookies.get('UserId') as string || "") || undefined
+    
+    let body;
+    if (password !== undefined && password.length > 0) {
+        body = {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            password: password,
+            currentPassword: currentPassword
+        }
+    } else {
+        body = {
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+        }
+    }
+
+    console.log(body)
+    const config = {
+        headers: {
+          "X-Authorization": Cookies.get('UserToken') || ""
+        }
+    }
+    
+    return await axios.patch(`http://localhost:4941/api/v1/users/${userId}`, body, config)
         .then((response) => {
             return response.status;
         })

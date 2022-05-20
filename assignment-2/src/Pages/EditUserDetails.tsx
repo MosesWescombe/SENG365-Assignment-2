@@ -2,7 +2,6 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
@@ -18,19 +17,24 @@ import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { login, register, uploadProfilePhoto } from '../Services/UserServices';
+import { deleteProfilePhoto, getLoggedInUser, getProfilePhoto, login, register, updateUser, uploadProfilePhoto } from '../Services/UserServices';
 import Badge from '@mui/material/Badge';
 import Avatar from '@mui/material/Avatar';
-import DriveFileRenameOutlineSharpIcon from '@mui/icons-material/DriveFileRenameOutlineSharp';
+import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
+import { IUserResult } from '../Types/IUserResult';
 
 const theme = createTheme();
 const acceptedFileTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif']
 
-export default function Register() {
-    const [formErrors, setFormErrors] = useState({email: '', password: '', fName: '', lName: '', global: ''})
+export default function EditUserDetails() {
+    const [formErrors, setFormErrors] = useState({email: '', password: '', fName: '', lName: '', currentPassword: '', global: ''})
     const [showPassword, setShowPassword] = useState(false)
     const [profilePhoto, setProfilePhoto] = useState(null)
     const [imageSrc, setImageSrc] = useState('')
+    const [user, setUser] = useState<IUserResult | undefined>(undefined)
+    const [firstName, setFirstName] = useState("")
+    const [lastName, setLastName] = useState("")
+    const [email, setEmail] = useState("")
     const navigate = useNavigate()
 
     // Submit
@@ -40,29 +44,48 @@ export default function Register() {
       const data = new FormData(event.currentTarget);
       const email: string = data.get('email') as string || ""
       const password: string = data.get('password') as string || ""
+      const currentPassword: string = data.get('oldPassword') as string || ""
       const firstName: string = data.get('firstName') as string || ""
       const lastName: string = data.get('lastName') as string || ""
 
       // Validate forms
       const emailValid = validateEmail(email)
-      const passwordValid = validatePassword(password)
       const fNameValid = validateFirstName(firstName)
       const lNameValid = validateLastName(lastName)
+      let passwordValid = true
+      if (password.length > 0 && currentPassword.length < 1) {
+        const newValue = {...formErrors, currentPassword: 'Required'}
+        setFormErrors(newValue)
+        passwordValid = validatePassword(password)
+        return
+      } else {
+        const newValue = {...formErrors, currentPassword: ''}
+        setFormErrors(newValue)
+      }
+
       const formValid = fNameValid && lNameValid && passwordValid && emailValid;
       
       if (!formValid) return;
 
-      const registerResponse = await register(firstName, lastName, email, password)
+      let updateResponse;
+      if (password.length > 0 && currentPassword.length > 0) {
+        updateResponse = await updateUser(firstName, lastName, email, password, currentPassword)
+      } else {
+        console.log("Correct")
+        updateResponse = await updateUser(firstName, lastName, email)
+      }
 
-      if (registerResponse === 500) {
+      if (updateResponse === 400) {
+        const newValue = {...formErrors, currentPassword: 'Incorrect password'}
+        setFormErrors(newValue)
+        return
+      }
+      if (updateResponse === 500) {
         const newValue = {...formErrors, email: 'Email is already taken'}
         setFormErrors(newValue)
         return
       }
-
-      const loginResponse = await login(email, password)
-
-      if (loginResponse !== 200) {
+      if (updateResponse !== 200) {
         const newValue = {...formErrors, global: 'Something went wrong'}
         setFormErrors(newValue)
         return
@@ -74,13 +97,21 @@ export default function Register() {
           const newValue = {...formErrors, global: 'Something went wrong'}
           setFormErrors(newValue)
         }
+      } else {
+        const uploadImageResponse = await deleteProfilePhoto()
+        if (uploadImageResponse !== 200 && uploadImageResponse !== 201) {
+          const newValue = {...formErrors, global: 'Something went wrong'}
+          setFormErrors(newValue)
+        }
       }
 
-      navigate('/auctions')
+      navigate('/profile')
+      document.location.reload()
     };
 
     // Validate functions 
     const validateEmail = (email: any) => {
+      setEmail(email)
       if (email == '') {
         const newValue = {...formErrors, email: 'Required'}
         setFormErrors(newValue)
@@ -97,10 +128,7 @@ export default function Register() {
     }
 
     const validatePassword = (password: any) => {
-      if (password == '') {
-        const newValue = {...formErrors, password: 'Required'}
-        setFormErrors(newValue)
-      } else if (password.length >= 6) {
+      if (password.length === 0 || password.length >= 6) {
         const newValue = {...formErrors, password: ''}
         setFormErrors(newValue)
         return true;
@@ -112,6 +140,8 @@ export default function Register() {
     }
 
     const validateFirstName = (fName: any) => {
+      setFirstName(fName)
+
       if (fName !== '') {
         const newValue = {...formErrors, fName: ''}
         setFormErrors(newValue)
@@ -124,9 +154,12 @@ export default function Register() {
     }
 
     const validateLastName = (lName: any) => {
+      setLastName(lName)
+
       if (lName !== '') {
         const newValue = {...formErrors, lName: ''}
         setFormErrors(newValue)
+        setLastName(lName)
         return true;
       } else {
         const newValue = {...formErrors, lName: 'Required'}
@@ -152,6 +185,27 @@ export default function Register() {
       setImageSrc(src)
     }
 
+    React.useEffect(() => {
+        const update = async () => {
+            const response = await getLoggedInUser()
+            if (response == undefined || response.status !== 200){navigate('/login'); return}
+
+            setUser(response.data)
+            setFirstName(response.data.firstName)
+            setLastName(response.data.lastName)
+            setEmail(response.data.email)
+
+            if (imageSrc == "") setImageSrc(getProfilePhoto())
+        }
+
+        update()
+    }, [])
+
+    const removeProfileImage = () => {
+      setImageSrc("none")
+      setProfilePhoto(null)
+    }
+
   return (
     <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
@@ -171,14 +225,12 @@ export default function Register() {
                   overlap="circular"
                   anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                   badgeContent={
-                    <>
-                      <label htmlFor='file-input'>
-                        <DriveFileRenameOutlineSharpIcon color='primary' />
-                      </label>
-                      <input hidden type="file" accept=".jpg,.jpeg,.png,.gif" id='file-input' onChange={async (e) => await changeProfile(e)}/>
-                    </>
+                    <DeleteForeverIcon onClick={removeProfileImage} color='primary' />
                   }>
-                  <Avatar sx={{height: 100, width: 100}} alt="User" src={imageSrc} />
+                  <label htmlFor='file-input'>
+                    <Avatar sx={{height: 100, width: 100}} alt={firstName} src={imageSrc} />
+                  </label>
+                  <input hidden type="file" accept=".jpg,.jpeg,.png,.gif" id='file-input' onChange={async (e) => await changeProfile(e)}/>
                 </Badge>
               </Grid>
 
@@ -196,6 +248,7 @@ export default function Register() {
                   fullWidth
                   id="firstName"
                   label="First Name"
+                  value={firstName}
                   autoFocus
 
                   error={formErrors.fName !== ''}
@@ -211,6 +264,7 @@ export default function Register() {
                   label="Last Name"
                   name="lastName"
                   autoComplete="family-name"
+                  value={lastName}
 
                   error={formErrors.lName !== ''}
                   helperText={formErrors.lName}
@@ -221,11 +275,11 @@ export default function Register() {
                 <TextField
                   required
                   fullWidth
-                  id="email"
                   label="Email Address"
                   name="email"
                   autoComplete="email"
                   type="email"
+                  value={email}
 
                   error={formErrors.email !== ''}
                   helperText={formErrors.email}
@@ -234,9 +288,8 @@ export default function Register() {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth variant="outlined">
-                  <InputLabel required error={formErrors.password !== ''} htmlFor="password">Password</InputLabel>
+                  <InputLabel error={formErrors.password !== ''} htmlFor="password">Password</InputLabel>
                   <OutlinedInput
-                    required
                     error={formErrors.password !== ''}
                     id="password"
                     name="password"
@@ -256,23 +309,54 @@ export default function Register() {
                     }
                     label="Password"
                   />
-                  <FormHelperText error id="component-helper-text">{formErrors.password}</FormHelperText>
+                  <FormHelperText error>{formErrors.password}</FormHelperText>
                 </FormControl>
               </Grid>
-            </Grid>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              sx={{ mt: 3, mb: 2 }}
-            >
-              Sign Up
-            </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <Link href="/login" variant="body2">
-                  Already have an account? Sign in
-                </Link>
+              <Grid item xs={12}>
+                <FormControl fullWidth variant="outlined">
+                  <InputLabel htmlFor="password" error={formErrors.currentPassword !== ''}>Current Password</InputLabel>
+                  <OutlinedInput
+                    id="oldPassword"
+                    name="oldPassword"
+                    error={formErrors.currentPassword !== ''}
+                    type={showPassword ? 'text' : 'password'}
+                    onChange={() => {setFormErrors({...formErrors, currentPassword: ""})}}
+                    endAdornment={
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={() => setShowPassword(!showPassword)}
+                          onMouseDown={(event) => event.preventDefault()}
+                          edge="end"
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    }
+                    label="Current Password"
+                  />
+                </FormControl>
+                <FormHelperText error>{formErrors.currentPassword}</FormHelperText>
+              </Grid>
+              <Grid item container xs={12} mt={2} columnSpacing={1} style={{display: 'flex', justifyContent: 'center'}}>
+                <Grid item xs={6}>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                  >
+                    Save Changes
+                  </Button>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      onClick={() => navigate('/profile')}
+                    >
+                      Cancel
+                    </Button>
+                </Grid>
               </Grid>
             </Grid>
           </Box>
