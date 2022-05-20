@@ -26,7 +26,7 @@ const NavBar = ({ profileImage, setProfileImage }: any) => {
 
   const handleOpenUserMenu = (event: React.MouseEvent<HTMLElement>) => {
     if (isLoggedIn()) {
-      settings = ['Profile', 'Account', 'Logout']
+      settings = ['Profile', 'Logout']
     } else {
       settings = ['Login', 'Register']
     }
