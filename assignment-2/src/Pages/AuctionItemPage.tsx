@@ -16,6 +16,7 @@ import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import TextField from "@mui/material/TextField";
 import { useNavigate } from "react-router-dom";
+import { EditAuctionControls } from "../components/EditAuctionControls";
 
 export const AuctionItemPage = () => {
     let { auctionId } = useParams();
@@ -107,7 +108,7 @@ export const AuctionItemPage = () => {
 
         const response = await postBid(auction.auctionId, tempAmount)
         console.log(response)
-        if (response.status == 201) setTrigger(!trigger);
+        if (response !== undefined && response.status == 201) setTrigger(!trigger);
     }
 
     return (
@@ -178,6 +179,13 @@ export const AuctionItemPage = () => {
                         <strong style={{paddingRight: 4}}>{getTimeRemaining(auction.endDate) == "closed"? "Closed" : "Closes"}:</strong> {" " + formatDate(auction.endDate)} ({getTimeRemaining(auction.endDate) })
                         </Typography>
                     </Grid>
+
+                    {getUserId() == auction.sellerId? (
+                        <Grid item xs={12}>
+                            <EditAuctionControls toggleTrigger={() => setTrigger(!trigger)} auction={auction} />
+                         </Grid>
+                    ): <></>}
+
                     <Grid item xs={12}>
                         <Paper style={{padding: 10, width: '100%', display: 'flex', justifyContent: 'center'}}>
                             <Grid container item xs={12} py={2}>
@@ -259,7 +267,6 @@ const imageContainerCSS = {
 }
 
 const imageCSS = {
-    flexShrink: 0,
-    minWidth: '100%',
-    minHeight: '100%',
+    flexGrow: 1,
+    maxWidth: '100%'
 }

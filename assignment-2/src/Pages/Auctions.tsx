@@ -19,7 +19,7 @@ import MenuItem from '@mui/material/MenuItem';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-const displayAmount = 4
+const displayAmount = 10
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;

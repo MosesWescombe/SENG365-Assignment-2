@@ -105,3 +105,8 @@ export const formatDateNoDay = (dateString: string): string => {
 
     return formatted;
 }
+
+export const getTodaysDate = (): Date => {
+    const date = new Date()
+    return date
+}

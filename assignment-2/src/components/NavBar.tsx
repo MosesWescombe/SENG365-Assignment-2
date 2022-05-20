@@ -16,7 +16,7 @@ import { logout, isLoggedIn , getProfilePhoto, getLoggedInUser} from '../Service
 import { useState } from 'react';
 import { useEffect } from 'react';
 
-const pages = ['Auctions'];
+const pages = ['Auctions', 'My Auctions'];
 let settings = ['Login', 'Register'];
 
 const NavBar = ({ profileImage, setProfileImage }: any) => {
@@ -52,7 +52,6 @@ const NavBar = ({ profileImage, setProfileImage }: any) => {
         const response = await getLoggedInUser()
 
         if (response == undefined || response.status !== 200) return
-        console.log(response)
         setUserName("test")
       }
 
@@ -119,7 +118,7 @@ const NavBar = ({ profileImage, setProfileImage }: any) => {
                 sx={{ my: 2, color: 'white', display: 'block' }}
               >
                 
-                <div onClick={(e) => navigate(page)}>{page}</div>
+                <div onClick={(e) => navigate(page.toLowerCase().replace(" ", "-"))}>{page}</div>
               </Button>
             ))}
           </Box>
