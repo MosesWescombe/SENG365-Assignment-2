@@ -56,7 +56,7 @@ export default function EditUserDetails() {
       if (password.length > 0 && currentPassword.length < 1) {
         const newValue = {...formErrors, currentPassword: 'Required'}
         setFormErrors(newValue)
-        passwordValid = validatePassword(password)
+        console.log(newValue)
         return
       } else {
         const newValue = {...formErrors, currentPassword: ''}
@@ -71,10 +71,10 @@ export default function EditUserDetails() {
       if (password.length > 0 && currentPassword.length > 0) {
         updateResponse = await updateUser(firstName, lastName, email, password, currentPassword)
       } else {
-        console.log("Correct")
         updateResponse = await updateUser(firstName, lastName, email)
       }
 
+      console.log(updateResponse)
       if (updateResponse === 400) {
         const newValue = {...formErrors, currentPassword: 'Incorrect password'}
         setFormErrors(newValue)
@@ -314,7 +314,7 @@ export default function EditUserDetails() {
               </Grid>
               <Grid item xs={12}>
                 <FormControl fullWidth variant="outlined">
-                  <InputLabel htmlFor="password" error={formErrors.currentPassword !== ''}>Current Password</InputLabel>
+                  <InputLabel htmlFor="oldPassword" error={formErrors.currentPassword !== ''}>Current Password</InputLabel>
                   <OutlinedInput
                     id="oldPassword"
                     name="oldPassword"
@@ -335,8 +335,8 @@ export default function EditUserDetails() {
                     }
                     label="Current Password"
                   />
+                  <FormHelperText error>{formErrors.currentPassword}</FormHelperText>
                 </FormControl>
-                <FormHelperText error>{formErrors.currentPassword}</FormHelperText>
               </Grid>
               <Grid item container xs={12} mt={2} columnSpacing={1} style={{display: 'flex', justifyContent: 'center'}}>
                 <Grid item xs={6}>

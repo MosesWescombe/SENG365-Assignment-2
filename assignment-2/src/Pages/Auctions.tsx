@@ -67,13 +67,15 @@ export const Auctions = () => {
             categoryTemp.categoryId !== category.categoryId
         ))
         const newFiltersAdded = [...newFiltersRemoved, category]
+        setPage(1)
         setFilters(newFiltersAdded)
-        update(page, sortBy, searchTerm, newFiltersAdded)
+        update(1, sortBy, searchTerm, newFiltersAdded)
     };
 
     const handleStatusChange = (event: any, value: string) => {
         setStatus(value)
-        update(page, sortBy, searchTerm, filters, value)
+        setPage(1)
+        update(1, sortBy, searchTerm, filters, value)
     };
 
     const handleSortChanged = (event: SelectChangeEvent<typeof sortBy>) => {
@@ -81,14 +83,16 @@ export const Auctions = () => {
             target: { value },
         } = event;
 
-        update(page, value)
         setSortBy(value)
+        setPage(1)
+        update(1, value)
     };
 
     const handleSearchChange = (event: any) => {
         const parameter = event.target.value
-        update(page, sortBy, parameter)
         setSearchTerm(parameter)
+        setPage(1)
+        update(1, sortBy, parameter)
     }
 
     const handleChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -144,7 +148,8 @@ export const Auctions = () => {
 
         if (response.status !== 200) return
         
-        setAuctions(response.data.auctions)
+        const auctions = response.data.auctions
+        setAuctions(auctions)
         setPages(Math.ceil(response.data.count / displayAmount))
 
         const categoryResponse = await fetchCategories()

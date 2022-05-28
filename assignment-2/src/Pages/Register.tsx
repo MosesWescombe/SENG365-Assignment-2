@@ -54,7 +54,7 @@ export default function Register() {
 
       const registerResponse = await register(firstName, lastName, email, password)
 
-      if (registerResponse === 500) {
+      if (registerResponse === 403) {
         const newValue = {...formErrors, email: 'Email is already taken'}
         setFormErrors(newValue)
         return

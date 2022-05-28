@@ -9,9 +9,11 @@ import InputLabel from '@mui/material/InputLabel';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { useEffect, useState } from "react"
-import { fetchCategories, fetchImage, patchAuction, postAuction, uploadPhoto } from "../Services/AuctionServices"
+import { deleteAuction, fetchAuction, fetchAuctions, fetchCategories, fetchImage, patchAuction, postAuction, uploadPhoto } from "../Services/AuctionServices"
 import { ICategoryItem } from "../Types/ICategoryItem"
 import { FormHelperText } from "@mui/material"
+import { exists } from "fs"
+import { IAuctionResult } from "../Types/IAuctionResult"
 
 const acceptedFileTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/gif']
 
@@ -123,45 +125,80 @@ export const AuctionFormModal = ({ onClose, auction, create, edit }: any) => {
             }
         }
 
-        if (title.length <= 0) {setFormErrors({...formErrors, title: "Required"}); return}
-        if (description.length <= 0) {setFormErrors({...formErrors, description: "Required"}); return}
-        if (category == undefined) {setFormErrors({...formErrors, category: "Required"}); return}
+        let newFormErrors = {...formErrors};
+
+        if (title.length <= 0) {setFormErrors({...newFormErrors, title: "Required"}); return}
+        else {newFormErrors = {...newFormErrors, title: ""}}
+        if (description.length <= 0) {setFormErrors({...newFormErrors, description: "Required"}); return}
+        else {newFormErrors = {...newFormErrors, description: ""}}
+        if (category == undefined) {setFormErrors({...newFormErrors, category: "Required"}); return}
+        else {newFormErrors = {...newFormErrors, category: ""}}
+
 
         let auctionIdTemp;
 
-        if (edit) {
-            const response = await patchAuction(body, auction.auctionId)
-            if (response == undefined || response.status !== 200) {
-                console.log(response)
-                const newValue = {...formErrors, title: 'Title is already taken'}
-                setFormErrors(newValue)
+        const config = {
+            startIndex: 0
+        }
+        const existsResponse = await fetchAuctions(config)
+        if (existsResponse.status != 200) {
+            newFormErrors = {...newFormErrors, global: 'Something went wrong'}
+            setFormErrors(newFormErrors)
+            return
+        } else {
+            newFormErrors = {...newFormErrors, global: ''}
+        }
+
+        // Check if exists
+        const auctions: any = existsResponse.data.auctions.filter((auction: IAuctionResult) => {
+            return auction.title.toLowerCase() === title.toLowerCase()
+        })
+
+        if (auctions.length > 0) {
+            console.log(edit, auction.auctionId, auctions[0].auctionId)
+            if (!edit || auction.auctionId !== auctions[0].auctionId) {
+                newFormErrors = {...newFormErrors, title: 'Title already exists'}
+                setFormErrors(newFormErrors)
                 return
-            }
-            auctionIdTemp = auction.auctionId
+            } else  newFormErrors = {...newFormErrors, title: ''}
+        } else  newFormErrors = {...newFormErrors, title: ''}
+
+        if (!edit && (auctionPhoto == null || auctionPhoto == undefined)) {
+            newFormErrors = {...newFormErrors, global: 'Please provide an image'}
+            setFormErrors(newFormErrors)
+            return
+        } else {
+            newFormErrors = {...newFormErrors, global: ''}
+        }
+
+        // Create the auction
+        let response;
+        if (edit) {
+            response = await patchAuction(body, auction.auctionId)
         }
         else {
-            const response = await postAuction(body)
-            if (response == undefined) return
-            if (response.status !== 201) {
-                console.log(response)
-                const newValue = {...formErrors, title: 'Title is already taken'}
-                setFormErrors(newValue)
-                return
-            }
-            auctionIdTemp = response.data.auctionId
+            response = await postAuction(body)
+        }
+
+        if (response == undefined || !(response.status == 200 || response.status == 201)) {
+            console.log(response)
+            newFormErrors = {...newFormErrors, title: 'Something went wrong'}
+            setFormErrors(newFormErrors)
+            return
+        } else {
+            newFormErrors = {...newFormErrors, title: ''}
+            if (edit) auctionIdTemp = auction.auctionId
+            else auctionIdTemp = response.data.auctionId
         }
 
         if (auctionPhoto !== null && auctionPhoto !== undefined) {
             const uploadImageResponse = await uploadPhoto(auctionPhoto, auctionIdTemp)
             if (uploadImageResponse !== 200 && uploadImageResponse !== 201) {
-                const newValue = {...formErrors, global: 'Something went wrong'}
-                setFormErrors(newValue)
+                newFormErrors = {...newFormErrors, global: 'Something went wrong'}
+                setFormErrors(newFormErrors)
+                await deleteAuction(auctionIdTemp)
                 return
             }
-        } else {
-            const newValue = {...formErrors, global: 'Please provide an image'}
-            setFormErrors(newValue)
-            return
         }
 
         onClose()
